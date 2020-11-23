@@ -1,7 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-
+import streamlit as st
 
 runs = 3
 OMEGA = 100000
@@ -24,21 +24,25 @@ def get_local_ips(ip_addr_state):
         if ip_addr_state[ip] == 'infected':
             for _ in range(SCAN_RATE):
                 if ip <= 10:
-                    rule = np.random.choice(['rule1', 'rule2'], 1, p=[0.8, 0.2])
+                    rule = np.random.choice(
+                        ['rule1', 'rule2'], 1, p=[0.8, 0.2])
                     if rule == 'rule1':
                         infect_ip = random.sample(range(1, ip + 1 + 10), 1)
                     elif rule == 'rule2':
                         infect_ip = random.sample(range(1, OMEGA + 1), 1)
                 elif ip >= (OMEGA - 10):
-                    rule = np.random.choice(['rule1', 'rule2'], 1, p=[0.8, 0.2])
+                    rule = np.random.choice(
+                        ['rule1', 'rule2'], 1, p=[0.8, 0.2])
                     if rule == 'rule1':
                         infect_ip = random.sample(range(ip - 10, OMEGA + 1), 1)
                     elif rule == 'rule2':
                         infect_ip = random.sample(range(1, OMEGA + 1), 1)
                 else:
-                    rule = np.random.choice(['rule1', 'rule2'], 1, p=[0.8, 0.2])
+                    rule = np.random.choice(
+                        ['rule1', 'rule2'], 1, p=[0.8, 0.2])
                     if rule == 'rule1':
-                        infect_ip = random.sample(range(ip - 10, ip + 1 + 10), 1)
+                        infect_ip = random.sample(
+                            range(ip - 10, ip + 1 + 10), 1)
                     elif rule == 'rule2':
                         infect_ip = random.sample(range(1, OMEGA + 1), 1)
                 local_ips.append(infect_ip[0])
@@ -51,7 +55,8 @@ def worm_propagation(ip_addr_state, method):
     for tick in range(total_simulation_steps):
         num_of_ips_to_scan = num_of_infected_ip * SCAN_RATE
         if method == 'random_scan':
-            infected_ips = random.sample(range(1, OMEGA + 1), num_of_ips_to_scan)
+            infected_ips = random.sample(
+                range(1, OMEGA + 1), num_of_ips_to_scan)
         elif method == 'local_preference':
             infected_ips = get_local_ips(ip_addr_state)
         for ip in infected_ips:
@@ -62,11 +67,17 @@ def worm_propagation(ip_addr_state, method):
                     break
 
         if (tick + 1) % 100 == 0:
-            print("Time steps: {0} ---- IPs_infected: {1}".format(tick + 1, num_of_infected_ip))
+            print(
+                "Time steps: {0} ---- IPs_infected: {1}".format(tick + 1, num_of_infected_ip))
+            st.text(
+                "Time steps: {0} ---- IPs_infected: {1}".format(tick + 1, num_of_infected_ip))
+
         infected_ip_count_discrete.append(num_of_infected_ip)
         if num_of_infected_ip == Total_vulnerable_ip:
-            print("Time steps: {0} ---- IPs_infected: {1}. \nAll IPs infected!!!".format(tick + 1,
-                                                                                              num_of_infected_ip))
+            print("Time steps: {0} ---- IPs_infected: {1}. \nAll IPs infected!!!".format(
+                tick + 1, num_of_infected_ip))
+            st.text("Time steps: {0} ---- IPs_infected: {1}. \nAll IPs infected!!!".format(
+                tick + 1, num_of_infected_ip))
             break
     return infected_ip_count_discrete
 
@@ -76,8 +87,10 @@ def plot_simulation(count, run):
 
 
 def worm_propagation_simulation(method, plot=False):
+    st.text("Random scan running")
     for run in range(runs):
         print("\n ****** {} Scan worm propagation: Run{}******".format(method, run+1))
+        st.text("\n ****** {} Scan worm propagation: Run{}******".format(method, run+1))
         ip_addr_state = initialize_ip_address_state()
         # print([i for i, x in enumerate(ip_addr_state) if x == 'immune'])
         ip_addr_state[1001] = 'infected'
@@ -88,8 +101,9 @@ def worm_propagation_simulation(method, plot=False):
         plt.xlabel("Time tick")
         plt.ylabel("Number of infected computers")
         plt.title("{}: 3 Simulation Runs of Worm Propagation".format(method))
+        st.set_option('deprecation.showPyplotGlobalUse', False)
         plt.legend()
-        plt.show()
+        st.pyplot()
 
 
 def main():
@@ -99,6 +113,4 @@ def main():
         worm_propagation_simulation(method, plot=True)
 
 
-main()
-
-
+# main()
